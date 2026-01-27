@@ -1,0 +1,47 @@
+name: Sync Assets to Main Repository
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - "*.svg"
+      - "*.png"
+  workflow_dispatch:  
+
+jobs:
+  sync:
+    name: Sync assets to main repo
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout assets repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Clone main repository
+        env:
+          WILD_CHICKEN_REPO_TOKEN: ${{ secrets.WILD_CHICKEN_REPO_TOKEN }}
+        run: |
+          git clone https://x-access-token:${WILD_CHICKEN_REPO_TOKEN}@github.com/WildChickenUniversity/WildChickenUniversity.git
+
+      - name: Copy updated assets
+        run: |
+          cp *.svg WildChickenUniversity/public/images/ 2>/dev/null
+          cp *.png WildChickenUniversity/public/images/ 2>/dev/null
+
+      - name: Commit and push changes
+        working-directory: WildChickenUniversity
+        env:
+          WILD_CHICKEN_REPO_TOKEN: ${{ secrets.WILD_CHICKEN_REPO_TOKEN }}
+        run: |
+          git add public/images/*.svg public/images/*.png 2>/dev/null
+
+          git commit -m "Update assets from assets repository"
+          git push origin master
