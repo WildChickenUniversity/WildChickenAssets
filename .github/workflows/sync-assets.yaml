@@ -35,13 +35,16 @@ jobs:
         run: |
           cp *.svg WildChickenUniversity/public/images/ 2>/dev/null
           cp *.png WildChickenUniversity/public/images/ 2>/dev/null
+          cp favicon.svg WildChickenUniversity/app/icon.svg 2>/dev/null
+          cp apple-touch-icon.png WildChickenUniversity/public 2>/dev/null
+          rm WildChickenUniversity/public/images/apple-touch-icon.png 2>/dev/null
 
       - name: Commit and push changes
         working-directory: WildChickenUniversity
         env:
           WILD_CHICKEN_REPO_TOKEN: ${{ secrets.WILD_CHICKEN_REPO_TOKEN }}
         run: |
-          git add public/images/*.svg public/images/*.png 2>/dev/null
+          git add *.svg *.png 2>/dev/null
 
           git commit -m "Update assets from assets repository"
           git push origin master
